@@ -1,9 +1,8 @@
-describe('Landing page', () => {
-    it('loads and navigates to dashboard', () => {
-      cy.visit('/');
-      cy.contains('Get Started').click();
-      cy.url().should('include', '/dashboard');
-      cy.contains('Dashboard').should('be.visible');
-    });
+describe('Landing navigation', () => {
+  it('opens Dashboard when Get Started is clicked', () => {
+    cy.visit('/');                           
+    cy.get('[data-cy=get-started]').click();
+    cy.url().should('include', '/dashboard');
+    cy.contains('Dashboard').should('be.visible');
   });
-  
+});

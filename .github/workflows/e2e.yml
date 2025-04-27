@@ -7,11 +7,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+        with: { node-version: '20' }
       - run: npm ci
       - run: npm run build -- --configuration production
+      - run: npx serve -s dist/cost-of-living-app -l 4200 &
       - uses: cypress-io/github-action@v6
         with:
-          start: npx http-server dist/cost-of-living-app -p 4200
           wait-on: 'http://localhost:4200'
