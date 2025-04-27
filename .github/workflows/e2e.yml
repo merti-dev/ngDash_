@@ -8,9 +8,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
+
       - run: npm ci
       - run: npm run build -- --configuration production
-      - run: npx serve -s dist/cost-of-living-app -l 4200 &
+
+      # ---- SPA server ----
+      - run: npx http-server dist/cost-of-living-app -p 4200 -s &
+        # http-server v14+:  -s   ==  --spa    (fallback to index.html)
+
       - uses: cypress-io/github-action@v6
         with:
           wait-on: 'http://localhost:4200'
