@@ -1,0 +1,6 @@
+/* old:
+@import "bootstrap/scss/bootstrap";
+*/
+
+/* new: */
+@use "bootstrap/scss/bootstrap" as *;
