@@ -10,12 +10,12 @@ import { MapComponent } from '../shared/map.component';
 import { SalaryChartComponent } from '../shared/salary-chart.component';
 
 interface Vm {
-  currentNet: number;
-  requiredNet: number;
-  cityName:   string;
-  gross:      number;
-  savings:    number;
+  currentNet:          number;
+  requiredNet:         number;
+  requiredGrossAnnual: number;
+  cityName:            string;
 }
+
 
 @Component({
   standalone: true,
@@ -44,11 +44,10 @@ export class DashboardComponent {
     ]).pipe(
       filter(([, req, city]) => req !== null && city !== null),
       map(([net, req, city, gross, save]) => ({
-        currentNet: net,
-        requiredNet: req as number,
-        cityName: city!.city,
-        gross,
-        savings: save
+        currentNet:          net,
+        requiredNet:         req as number,
+        requiredGrossAnnual: Math.round(req! * 12 / 0.62),
+        cityName:            city!.city
       }))
     );
   }
