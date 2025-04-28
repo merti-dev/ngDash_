@@ -1,97 +1,65 @@
-<!-- USER PROFILE -------------------------------------------------- -->
-<div class="row g-4 mb-4">
-  <div class="col-lg-8 col-xl-6 mx-auto">
-    <div class="card-lite p-4">
-      <h5 class="section-title mb-3">Your profile</h5>
-
-      <form class="row g-3">
-        <!-- gross salary -->
-        <div class="col-md-6">
-          <label class="form-label small">Gross annual salary (€)</label>
-          <input type="number"
-                 class="form-control"
-                 [ngModel]="state.gross$ | async"
-                 name="gross"
-                 (ngModelChange)="state.setGrossAnnual($event)">
-        </div>
-
-        <!-- savings goal -->
-        <div class="col-md-6">
-          <label class="form-label small">Monthly savings goal (€)</label>
-          <input type="number"
-                 class="form-control"
-                 [ngModel]="state.savings$ | async"
-                 name="savings"
-                 (ngModelChange)="state.setSavings($event)">
-        </div>
-      </form>
+<!-- PROFILE CARD --------------------------------------------------- -->
+<div class="card-elevated p-4 mb-4">
+  <h5 class="mb-3"><i class="bi bi-person-circle me-2"></i>Your profile</h5>
+  <form class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label small">Gross annual salary (€)</label>
+      <input type="number"
+             class="form-control"
+             [ngModel]="state.gross$ | async"
+             name="gross"
+             (ngModelChange)="state.setGrossAnnual($event)" />
     </div>
-  </div>
+    <div class="col-md-6">
+      <label class="form-label small">Monthly savings goal (€)</label>
+      <input type="number"
+             class="form-control"
+             [ngModel]="state.savings$ | async"
+             name="savings"
+             (ngModelChange)="state.setSavings($event)" />
+    </div>
+  </form>
 </div>
 
-<!-- MAP + CHART ROW ---------------------------------------------- -->
+<!-- MAP + CHART ROW ------------------------------------------------ -->
 <div class="row g-4">
-  <!-- map -->
   <div class="col-12 col-lg-6">
-    <div class="card-lite">
+    <div class="card-elevated">
       <app-map></app-map>
     </div>
   </div>
 
-  <!-- chart / placeholder -->
   <div class="col-12 col-lg-6">
-    <div class="card-lite p-4 h-100 d-flex flex-column">
-
-      <!-- when no city yet -->
-      <ng-container *ngIf="!(vm$ | async); else chartBlock">
-        <div class="d-flex flex-grow-1 align-items-center justify-content-center text-muted">
-          <em>Select a city marker&nbsp;to see the comparison.</em>
+    <div class="card-elevated p-4 h-100 d-flex flex-column">
+      <ng-container *ngIf="vm$ | async as vm; else placeholder">
+        <h5 class="mb-3">
+          <i class="bi bi-pin-map-fill me-2"></i>{{ vm.cityName }} comparison
+        </h5>
+        <div class="chart-wrapper flex-grow-1">
+          <app-salary-chart [current]="vm.currentNet"
+                            [required]="vm.requiredNet">
+          </app-salary-chart>
         </div>
+        <p class="mt-3 mb-0">
+          Need <strong>{{ vm.requiredNet | number:'1.0-0' }} € net</strong>
+          to keep saving {{ state.savings$ | async }} €/mo.<br>
+          <span class="small text-muted">
+            ≈ {{ vm.requiredGrossAnnual | number:'1.0-0' }} € gross / year
+          </span>
+        </p>
       </ng-container>
 
-      <!-- real chart + summary -->
-      <ng-template #chartBlock>
-        <ng-container *ngIf="vm$ | async as vm">
-          <h5 class="section-title mb-3">{{ vm.cityName }} – salary comparison</h5>
-
-          <div class="chart-wrapper flex-grow-1">
-            <app-salary-chart
-              [current]="vm.currentNet"
-              [required]="vm.requiredNet">
-            </app-salary-chart>
-          </div>
-
-          <p class="mt-3 fs-6">
-            To keep saving <strong>{{ state.savings$ | async }} €</strong>
-            each month in <strong>{{ vm.cityName }}</strong>, you would need
-            <strong>{{ vm.requiredNet | number:'1.0-0' }} € net</strong>.
-            <span *ngIf="vm.requiredNet !== vm.currentNet">
-              That is
-              <span [class.text-danger]="vm.requiredNet > vm.currentNet"
-                    [class.text-success]="vm.requiredNet < vm.currentNet">
-                {{ (vm.requiredNet - vm.currentNet) | number:'1.0-0' }} €
-              </span>
-              {{ vm.requiredNet > vm.currentNet ? 'more' : 'less' }}
-              than your current net salary.
-            </span><br>
-            <span class="small text-muted">
-              ≈ {{ vm.requiredGrossAnnual | number:'1.0-0' }} € gross per year in {{ vm.cityName }}.
-            </span>
-          </p>
-        </ng-container>
+      <ng-template #placeholder>
+        <div class="text-center text-muted flex-grow-1 d-flex align-items-center justify-content-center">
+          <em>Select a city marker on the map</em>
+        </div>
       </ng-template>
-
     </div>
   </div>
 </div>
 
-<!-- INFO BAR ------------------------------------------------------ -->
-<div class="row g-4 mt-4">
-  <div class="col-lg-8 col-xl-6 mx-auto">
-    <div class="card-lite p-3 text-center">
-      <span class="fw-semibold">Reference city:</span> Mannheim&nbsp;🇩🇪 |
-      <span class="fw-semibold">Gross annual salary:</span>
-      {{ state.gross$ | async | number:'1.0-0' }} €
-    </div>
-  </div>
+<!-- INFO BAR ------------------------------------------------------- -->
+<div class="text-center small mt-4">
+  <strong>Reference city:</strong> Mannheim ·
+  <strong>Gross annual salary:</strong> {{ state.gross$ | async | number:'1.0-0' }} €
 </div>
