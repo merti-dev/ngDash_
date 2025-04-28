@@ -1,6 +1,17 @@
-/* old:
-@import "bootstrap/scss/bootstrap";
-*/
-
-/* new: */
 @use "bootstrap/scss/bootstrap" as *;
+
+.section-title { @extend .fw-semibold; color: $primary; }
+.map-container { height: 60vh; border-radius: .75rem; overflow: hidden; }
+
+
+
+@import "leaflet/dist/leaflet.css";
+
+$primary: #004b7f;
+$secondary: #00a8e8;
+$body-bg: #f3f6f9;
+
+form .form-control {
+    font-weight: 500;
+  }
+  
