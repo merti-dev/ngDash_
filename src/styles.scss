@@ -1,17 +1,56 @@
-@use "bootstrap/scss/bootstrap" as *;
+/* -------------------------------------------------------------------
+   1.  Custom Variables
+------------------------------------------------------------------- */
 
-.section-title { @extend .fw-semibold; color: $primary; }
-.map-container { height: 60vh; border-radius: .75rem; overflow: hidden; }
+/* Önce kendi değişkenlerini tanımla */
+$font-family-sans-serif: "Inter", system-ui, sans-serif;
+$primary:   #0061b5;
+$secondary: #00b4d8;
+$success:   #37b24d;
+$danger:    #e03131;
+$body-bg:   #f5f7fb;
+$body-color: #273247;
+$spacer: 1rem;
 
+/* -------------------------------------------------------------------
+   2.  Bootstrap import with overridden variables
+------------------------------------------------------------------- */
+@use "bootstrap/scss/bootstrap" with (
+  $font-family-sans-serif: $font-family-sans-serif,
+  $primary:   $primary,
+  $secondary: $secondary,
+  $success:   $success,
+  $danger:    $danger,
+  $body-bg:   $body-bg,
+  $body-color: $body-color,
+  $spacer: $spacer
+);
 
-
+/* -------------------------------------------------------------------
+   3.  External CSS imports
+------------------------------------------------------------------- */
 @import "leaflet/dist/leaflet.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
-$primary: #004b7f;
-$secondary: #00a8e8;
-$body-bg: #f3f6f9;
+/* -------------------------------------------------------------------
+   4.  Custom Styles
+------------------------------------------------------------------- */
 
-form .form-control {
-    font-weight: 500;
-  }
-  
+h1, h2, h3, h4, h5 { font-weight: 600; }
+
+.card-elevated {
+  @extend .shadow-sm;
+  border: none;
+  border-radius: .75rem;
+  background-color: #fff;
+}
+
+.section-py { padding-block: 2.5rem; }
+
+.navbar-branding {
+  background: linear-gradient(90deg, $primary 0%, darken($primary, 5%) 100%);
+}
+
+.chart-wrapper { height: 320px; }
+
+.map-container { height: 60vh; border-radius: .75rem; overflow: hidden; }
