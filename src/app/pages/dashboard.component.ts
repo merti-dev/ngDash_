@@ -6,6 +6,7 @@ import { filter, map } from 'rxjs/operators';
 import { CostStateService } from '../core/cost-state.service';
 import { MapComponent } from '../shared/map.component';
 import { SalaryChartComponent } from '../shared/salary-chart.component';
+import { FormsModule } from '@angular/forms';
 
 interface Vm {
   currentNet: number;
@@ -18,7 +19,7 @@ interface Vm {
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [NgIf, AsyncPipe, DecimalPipe, MapComponent, SalaryChartComponent]
+  imports: [ NgIf, AsyncPipe, DecimalPipe, FormsModule,NgIf, AsyncPipe, DecimalPipe, MapComponent, SalaryChartComponent]
 })
 export class DashboardComponent {
 
