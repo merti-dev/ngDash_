@@ -1,0 +1,28 @@
+<!-- NAVBAR -------------------------------------------------------- -->
+<nav class="navbar navbar-dark navbar-branding shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+        <i class="bi bi-graph-up"></i> CostLens
+      </a>
+      <a class="nav-link text-white-50 small" href="https://costlens.io" target="_blank">
+        Docs
+      </a>
+    </div>
+  </nav>
+  
+  <!-- PAGE HEADER --------------------------------------------------- -->
+  <header class="page-header">
+    <h1 class="h3 fw-bold mb-0">Dashboard</h1>
+    <p class="small opacity-75 mb-0">Compare purchasing power across German cities</p>
+  </header>
+  
+  <!-- MAIN CONTENT -------------------------------------------------- -->
+  <main class="container-fluid section-py">
+    <router-outlet></router-outlet>
+  </main>
+  
+  <!-- FOOTER -------------------------------------------------------- -->
+  <footer class="app-footer text-center small text-muted">
+    © {{ year }} CostLens · All rights reserved
+  </footer>
+  
