@@ -1,49 +1,37 @@
 /**********************************************************************************************
- *  CostStateService
- *  ----------------
- *  • Central, RxJS-powered application state
- *  • Holds gross salary, savings target, currently-selected city
- *  • Exposes derived streams: netMonthly$ & requiredNet$
+ *  CostStateService – central reactive state container
  *********************************************************************************************/
 
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, Observable, take } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, map, Observable, shareReplay, take } from 'rxjs';
 
 import { CityCost } from '../models/city-cost.model';
 import { CityDataService } from './city-data.service';
-
 import { approxNet2025 } from '../utils/net-approx';
 import { requiredNetSalary } from '../utils/cost-helpers';
 
 @Injectable({ providedIn: 'root' })
 export class CostStateService {
-  /* ───────────────────────────── raw state ───────────────────────────── */
+  /* raw state */
+  private readonly grossAnnualSub  = new BehaviorSubject<number>(46_000);
+  private readonly savingsSub      = new BehaviorSubject<number>(600);
+  private readonly selectedCitySub = new BehaviorSubject<CityCost | null>(null);
 
-  private readonly grossAnnual$  = new BehaviorSubject<number>(46_000); // €/year (gross)
-  private readonly savings$      = new BehaviorSubject<number>(600);    // €/month
-  readonly selectedCity$ = new BehaviorSubject<CityCost | null>(null);
+  /* public observables */
+  readonly gross$        = this.grossAnnualSub.asObservable();
+  readonly savings$      = this.savingsSub.asObservable();
+  readonly selectedCity$ = this.selectedCitySub.asObservable();
+  readonly cities$: Observable<CityCost[]>;
 
-  /* ──────────────────────── injected & constructor ───────────────────── */
-
-  /** List of all cities (shared replay); assigned in ctor to satisfy strict mode */
-  readonly cities$!: Observable<CityCost[]>;
-
-  constructor(private cityData: CityDataService) {
-    this.cities$ = this.cityData.list().pipe(shareReplay(1));
-  }
-
-  /* ─────────────────────────── derived state ─────────────────────────── */
-
-  /** Current net salary per month (auto-recalculated when gross changes) */
-  readonly netMonthly$ = this.grossAnnual$.pipe(
-    map(gross => approxNet2025(gross) / 12),
+  readonly netMonthly$ = this.gross$.pipe(
+    map(g => approxNet2025(g) / 12),
     shareReplay(1)
   );
 
-  /** Required net salary in selected city to keep same purchasing power */
   readonly requiredNet$ = combineLatest([
-    this.netMonthly$, this.savings$, this.selectedCity$
+    this.netMonthly$,
+    this.savings$,
+    this.selectedCity$
   ]).pipe(
     map(([net, save, city]) =>
       city ? requiredNetSalary(net, save, city.index) : null
@@ -51,30 +39,38 @@ export class CostStateService {
     shareReplay(1)
   );
 
-  /* ───────────────────────────── mutators ───────────────────────────── */
+  /* persistence keys */
+  private readonly LS_GROSS   = 'col:grossAnnual';
+  private readonly LS_SAVINGS = 'col:savings';
 
-  /** Update annual gross salary (in €). */
-  setGrossAnnual(value: number): void {
-    this.grossAnnual$.next(value);
+  constructor(private cityData: CityDataService) {
+    /* cache city list */
+    this.cities$ = this.cityData.list().pipe(shareReplay(1));
+
+    /* restore persisted values */
+    const g = Number(localStorage.getItem(this.LS_GROSS));
+    const s = Number(localStorage.getItem(this.LS_SAVINGS));
+    if (!Number.isNaN(g)) this.grossAnnualSub.next(g);
+    if (!Number.isNaN(s)) this.savingsSub.next(s);
   }
 
-  /** Update monthly savings target (in €). */
-  setSavings(value: number): void {
-    this.savings$.next(value);
+  /* mutators */
+  setGrossAnnual(v: number): void {
+    this.grossAnnualSub.next(v);
+    localStorage.setItem(this.LS_GROSS, v.toString());
   }
 
-  /** Select a city via Map click or any CityCost object. */
-  selectCity(city: CityCost): void {
-    this.selectedCity$.next(city);
+  setSavings(v: number): void {
+    this.savingsSub.next(v);
+    localStorage.setItem(this.LS_SAVINGS, v.toString());
   }
 
-  /** Convenience: select a city just by its name. */
+  selectCity(c: CityCost): void { this.selectedCitySub.next(c); }
+
   selectCityByName(name: string): void {
-    this.cities$
-      .pipe(
-        map(list => list.find(c => c.city === name) ?? null),
-        take(1)
-      )
-      .subscribe(city => this.selectedCity$.next(city));
+    this.cities$.pipe(
+      map(list => list.find(c => c.city === name) ?? null),
+      take(1)
+    ).subscribe(c => this.selectedCitySub.next(c));
   }
 }
