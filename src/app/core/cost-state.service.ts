@@ -22,7 +22,7 @@ export class CostStateService {
 
   private readonly grossAnnual$  = new BehaviorSubject<number>(46_000); // €/year (gross)
   private readonly savings$      = new BehaviorSubject<number>(600);    // €/month
-  private readonly selectedCity$ = new BehaviorSubject<CityCost | null>(null);
+  readonly selectedCity$ = new BehaviorSubject<CityCost | null>(null);
 
   /* ──────────────────────── injected & constructor ───────────────────── */
 
